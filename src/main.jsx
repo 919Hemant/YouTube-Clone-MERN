@@ -4,41 +4,28 @@ import './index.css'
 import App from './App.jsx'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Error from './component/Error.jsx'
-import SideBar from './component/SideBar.jsx'
+import Header from './component/Header.jsx'
+import Sidebar from './component/SideBar.jsx'
 import VideoCard from './component/VideoCard.jsx'
 import ViewVideo from './component/ViewVideo.jsx'
-import ChannelDetails from './component/ChannelDetails.jsx'
 import SignIn from './component/SignIn.jsx'
 import SignUp from './component/SignUp.jsx'
-import CategoryWiseFilter from './component/CategoryWiseFilter.jsx'
-import React, { useState } from 'react'
+import ChannelDetails from './component/ChannelDetails.jsx'
 
-
-const HomePage = () => {
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  
-  const handleCategorySelect = (category) => {
-    setSelectedCategory(category);
-  };
-  
-  return (
-    <>
-      <SideBar />
-      <CategoryWiseFilter onCategorySelect={handleCategorySelect} />
-      <VideoCard selectedCategory={selectedCategory} />
-    </>
-  );
-};
-
-
-const appRouter = createBrowserRouter([
+// Router configuration
+let appRouter = createBrowserRouter([
   {
     path: '/',
     element: <App />,
     children: [
       {
         index: true,
-        element: <HomePage />
+        element: (
+          <>
+            <Sidebar />
+            <VideoCard />
+          </>
+        ),
       },
       {
         path: '/channelDetails',

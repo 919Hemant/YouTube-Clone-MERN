@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useOutletContext } from "react-router-dom";
+import ShowCard from "./ShowCard";
 import './VideoCard.css';
-import Shimmer from './Shimmer';
-import { SearchContext } from './Header';
-import ShowCard from './ShowCard';
+import CategoryWiseFilter from "./CategoryWiseFilter";
+import Shimmer from './Shimmer.jsx';
 
-
+// This is a placeholder for dummy data. Later you can replace with API calls.
 const videos = [
   {
     id: '1',
@@ -141,68 +141,56 @@ const videos = [
   }
 ];
 
-const VideoCard = ({ selectedCategory }) => {
-  const [loading, setLoading] = useState(true);
-  const [filteredVideos, setFilteredVideos] = useState([]);
-  const { searchQuery, isSearching, setIsSearching } = useContext(SearchContext);
+function VideoCard() {
+  // Get context from parent components
+  const context = useOutletContext();
+  const flag = context ? context.flag : true;
+  const titleName = context ? context.titleName : '';
   
+  const [videoDetails, setVideoDetails] = useState([]);
+  const [dummyVideoDetails, setDummyVideoDetails] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Initial load of dummy data
   useEffect(() => {
     setLoading(true);
-    
     setTimeout(() => {
-      console.log("Selected Category:", selectedCategory);
-      console.log("Search Query:", searchQuery);
-      
-      let filtered = [...videos];
-      
-      // Filter by category if selected
-      if (selectedCategory && selectedCategory !== 'All') {
-        filtered = filtered.filter(video => video.category === selectedCategory);
-        console.log("After category filter:", filtered.length);
-      }
-      
-      // Filter by search query if there is one
-      if (searchQuery) {
-        filtered = filtered.filter(video => 
-          video.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          video.channelName.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-        console.log("After search filter:", filtered.length);
-      }
-      
-      setFilteredVideos(filtered);
+      setVideoDetails(videos);
+      setDummyVideoDetails(videos);
       setLoading(false);
-      
-      if (isSearching) {
-        setIsSearching(false);
-      }
     }, 1000);
-  }, [selectedCategory, searchQuery, isSearching, setIsSearching]);
-  
-  if (loading) {
-    return <Shimmer />;
-  }
-  
-  if (filteredVideos.length === 0) {
-    return (
-      <div className="content-container">
-        <div className="no-results">
-          <h2>No videos found</h2>
-          <p>Try a different search term or category</p>
-        </div>
-      </div>
-    );
-  }
-  
+  }, []);
+
+  // Filter videos based on search query
+  useEffect(() => {
+    if (titleName) {
+      const filteredArray = dummyVideoDetails.filter((video) =>
+        video.title.toLowerCase().includes(titleName.toLowerCase()) ||
+        video.channelName.toLowerCase().includes(titleName.toLowerCase())
+      );
+      setVideoDetails(filteredArray);
+    } else {
+      setVideoDetails(dummyVideoDetails);
+    }
+  }, [titleName, dummyVideoDetails]);
+
   return (
-    <div className="content-container">
-      <div className="video-grid">
-        {filteredVideos.map((video) => (
-          <ShowCard key={video.id} video={video} />
-        ))}
+    <>
+      <div id='button-category' className="fixed p-6 top-[3rem] w-[100%] bg-[#0f0f0f] z-20 left-[10.9rem] h-[4.5rem] text-white">
+        <CategoryWiseFilter SetDetails={setVideoDetails} />
       </div>
-    </div>
+      
+      {loading ? (
+        <Shimmer />
+      ) : (
+        <div id={`${flag ? 'grid' : 'grid-width'}`}>
+          {videoDetails.map((video) => (
+            <ShowCard key={video.id} video={video} />
+          ))}
+        </div>
+      )}
+    </>
   );
-};
+}
 
 export default VideoCard; 
