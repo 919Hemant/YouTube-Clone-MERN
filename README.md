@@ -35,5 +35,5 @@ This repository contains a fully functional YouTube clone built with modern web 
 - https://drive.google.com/file/d/1AQXc_Mz2x3vU4BFOqFYH33Mn-T1HrEqU/view?usp=sharing
 
 ## Deployed Website Link
-- https://you-tube-project
+- https://you-tube-clone-mern-one.vercel.app/
 
