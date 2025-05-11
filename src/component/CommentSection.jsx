@@ -1,210 +1,175 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import './CommentSection.css';
+import { useState, useEffect } from "react";
+import {Link,useParams} from 'react-router-dom';
 
+function CommentSection() {
+  const token = localStorage.getItem('token');
+  const [commentDetails, set_comment] = useState([]);
+  const [content, set_content] = useState(''); // For new comments
+  const [editMode, setEditMode] = useState(null); // To track which comment is being edited
+  const [editContent, setEditContent] = useState(''); // For editing existing comment
+  const Name_user = localStorage.getItem('Name');
+   const Video_id_Num=useParams().id;
+   console.log(Video_id_Num)
+  // Fetch comments from backend
+  useEffect(() => {
+    fetch('https://youtube-project-py16.onrender.com/getComments')
+      .then((response) => response.json())
+      .then((data) => set_comment(data))
+      .catch((error) => console.error("Error fetching comments:", error));
+  }, [commentDetails]);
 
-const dummyComments = [
-  {
-    id: 1,
-    username: 'TechEnthusiast',
-    userAvatar: 'https://randomuser.me/api/portraits/men/32.jpg',
-    text: 'This tutorial helped me a lot with my project! Thank you for sharing this knowledge.',
-    likes: 42,
-    timestamp: '2 weeks ago',
-    replies: [
-      {
-        id: 101,
-        username: 'CodeMaster',
-        userAvatar: 'https://randomuser.me/api/portraits/women/44.jpg',
-        text: 'Glad it helped! If you have any questions, feel free to ask.',
-        likes: 5,
-        timestamp: '1 week ago',
-      }
-    ]
-  },
-  {
-    id: 2,
-    username: 'WebDeveloper2022',
-    userAvatar: 'https://randomuser.me/api/portraits/women/29.jpg',
-    text: 'Great explanation! I was confused about this topic for a long time, but now it makes perfect sense.',
-    likes: 28,
-    timestamp: '3 days ago',
-    replies: []
-  },
-  {
-    id: 3,
-    username: 'ProgrammingStudent',
-    userAvatar: 'https://randomuser.me/api/portraits/men/41.jpg',
-    text: 'Is there a GitHub repo with the full code? I would like to study it in more detail.',
-    likes: 15,
-    timestamp: '1 day ago',
-    replies: [
-      {
-        id: 201,
-        username: 'HelperDev',
-        userAvatar: 'https://randomuser.me/api/portraits/men/22.jpg',
-        text: 'Not OP, but I found this similar repo: github.com/example/project',
-        likes: 7,
-        timestamp: '20 hours ago',
-      }
-    ]
-  },
-];
+  // Add a new comment
+  const handleclick = () => {
+    if (!content.trim()) return;
 
-const CommentSection = () => {
-  const [comments, setComments] = useState(dummyComments);
-  const [newComment, setNewComment] = useState('');
-  const [showReplies, setShowReplies] = useState({});
+    fetch('https://youtube-project-py16.onrender.com/add', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ content, username: Name_user ,Video_id_Num}),
+    })
+      .then((response) => response.json())
+      .then((newComment) => set_comment([newComment, ...commentDetails]))
+      .catch((error) => console.error("Error adding comment:", error));
 
-  const handleAddComment = (e) => {
-    e.preventDefault();
-    if (!newComment.trim()) return;
-    
-    const comment = {
-      id: Date.now(),
-      username: 'You',
-      userAvatar: 'https://randomuser.me/api/portraits/lego/1.jpg',
-      text: newComment,
-      likes: 0,
-      timestamp: 'Just now',
-      replies: []
-    };
-    
-    setComments([comment, ...comments]);
-    setNewComment('');
+    set_content(''); // Reset new comment content
   };
 
-  const toggleReplies = (commentId) => {
-    setShowReplies(prev => ({
-      ...prev,
-      [commentId]: !prev[commentId]
-    }));
+  // Delete a comment
+  const handleDelete = (id) => {
+    fetch(`https://youtube-project-py16.onrender.com/delete/${id}`, {
+      method: 'DELETE',
+    })
+      .then((response) => {
+        if (response.ok) {
+          set_comment(commentDetails.filter((comment) => comment._id !== id));
+        } else {
+          console.error("Error deleting comment:", response.statusText);
+        }
+      })
+      .catch((error) => console.error("Error deleting comment:", error));
   };
-  
+
+  // Update a comment
+  const handleEdit = (id, newContent) => {
+    fetch(`https://youtube-project-py16.onrender.com/edit/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ content: newContent }),
+    })
+      .then((response) => response.json())
+      .then((updatedComment) => {
+        const updatedComments = commentDetails.map((comment) =>
+          comment._id === id ? updatedComment : comment
+        );
+        set_comment(updatedComments);
+        setEditMode(null); // Reset edit mode after saving
+        setEditContent(''); // Reset edit content
+      })
+      .catch((error) => console.error("Error updating comment:", error));
+  };
+
   return (
-    <div className="comment-section">
-      <h3 className="comments-header">{comments.length} Comments</h3>
-      
-      <div className="add-comment">
-        <div className="user-avatar">
-          <img 
-            src="https://randomuser.me/api/portraits/lego/1.jpg" 
-            alt="Your avatar"
-            onError={(e) => {
-              e.target.onerror = null;
-              e.target.src = 'https://static.vecteezy.com/system/resources/thumbnails/002/318/271/small/user-profile-icon-free-vector.jpg';
-            }}
-          />
-        </div>
-        
-        <form onSubmit={handleAddComment} className="comment-form">
+    <div className="max-w-4xl mx-auto p-4 mt-3 rounded-lg bg-[#212121] text-white">
+      {/* Comment Input Section */}
+      {token ? (
+        <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <input
             type="text"
             placeholder="Add a comment..."
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            className="comment-input"
+            value={content}
+            onChange={(e) => set_content(e.target.value)} // New comment input
+            className="p-3 border border-gray-600 rounded-md w-full bg-[#212121] text-white focus:outline-none focus:ring-2 focus:ring-white"
           />
+          <button
+            onClick={handleclick}
+            className="p-3 bg-[#ff0000] text-white rounded-md w-full sm:w-auto hover:bg-green-700 focus:outline-none "
+          >
+            Comment
+          </button>
+        </div>
+      ) : (
+        <div className="mb-6 text-center text-gray-400">
+               <h1 className="  m-4 text-white font-bold ">Please <Link to='/SignIn'><span className="text-[#33f733] underline">Login</span> </Link>  in order to add comments</h1>
+        </div>
+      )}
+
+      {/* Comments Section */}
+      <div className="space-y-4">
+        {commentDetails.map((comment,index) => (
           
-          <div className="comment-actions">
-            <button type="button" onClick={() => setNewComment('')} className="cancel-btn">
-              Cancel
-            </button>
-            <button type="submit" className="comment-btn" disabled={!newComment.trim()}>
-              Comment
-            </button>
-          </div>
-        </form>
-      </div>
-      
-      <div className="comments-list">
-        {comments.map((comment) => (
-          <div key={comment.id} className="comment">
-            <div className="comment-avatar">
-              <img 
-                src={comment.userAvatar} 
-                alt={`${comment.username}'s avatar`}
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = 'https://static.vecteezy.com/system/resources/thumbnails/002/318/271/small/user-profile-icon-free-vector.jpg';
-                }}
-              />
-            </div>
-            
-            <div className="comment-content">
-              <div className="comment-header">
-                <Link to="#" className="username">{comment.username}</Link>
-                <span className="timestamp">{comment.timestamp}</span>
-              </div>
-              
-              <p className="comment-text">{comment.text}</p>
-              
-              <div className="comment-footer">
-                <button className="like-btn">
-                  <i className="fa-regular fa-thumbs-up"></i>
-                  {comment.likes > 0 && <span>{comment.likes}</span>}
-                </button>
-                <button className="dislike-btn">
-                  <i className="fa-regular fa-thumbs-down"></i>
-                </button>
-                <button className="reply-btn">Reply</button>
-              </div>
-              
-              {comment.replies.length > 0 && (
-                <div className="replies-section">
-                  <button 
-                    className="toggle-replies" 
-                    onClick={() => toggleReplies(comment.id)}
+          <div
+          
+            key={comment._id||index}
+            className="bg-[#212121] border border-gray-600 p-4 rounded-lg flex flex-col gap-2"
+          >
+            {/* Comment Text */}
+            {editMode === comment._id ? (
+              <div className="flex flex-col gap-2">
+                <input
+                  type="text"
+                  value={editContent} // Use editContent for editing
+                  onChange={(e) => setEditContent(e.target.value)} // Update edit content
+                  className="p-3 border border-gray-600 rounded-md w-full bg-[#212121] text-white focus:outline-none focus:ring-2 focus:ring-white"
+                />
+                <div className="flex gap-4 mt-2">
+                  <button
+                    onClick={() => handleEdit(comment._id, editContent)} // Save edited comment
+                    className="p-2 bg-[#ff0000] text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-white"
                   >
-                    {showReplies[comment.id] ? 'Hide' : 'View'} {comment.replies.length} {comment.replies.length === 1 ? 'reply' : 'replies'}
+                    Save
                   </button>
-                  
-                  {showReplies[comment.id] && (
-                    <div className="replies">
-                      {comment.replies.map((reply) => (
-                        <div key={reply.id} className="reply">
-                          <div className="comment-avatar">
-                            <img 
-                              src={reply.userAvatar} 
-                              alt={`${reply.username}'s avatar`}
-                              onError={(e) => {
-                                e.target.onerror = null;
-                                e.target.src = 'https://static.vecteezy.com/system/resources/thumbnails/002/318/271/small/user-profile-icon-free-vector.jpg';
-                              }}
-                            />
-                          </div>
-                          
-                          <div className="comment-content">
-                            <div className="comment-header">
-                              <Link to="#" className="username">{reply.username}</Link>
-                              <span className="timestamp">{reply.timestamp}</span>
-                            </div>
-                            
-                            <p className="comment-text">{reply.text}</p>
-                            
-                            <div className="comment-footer">
-                              <button className="like-btn">
-                                <i className="fa-regular fa-thumbs-up"></i>
-                                {reply.likes > 0 && <span>{reply.likes}</span>}
-                              </button>
-                              <button className="dislike-btn">
-                                <i className="fa-regular fa-thumbs-down"></i>
-                              </button>
-                              <button className="reply-btn">Reply</button>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                  <button
+                    onClick={() => {
+                      setEditMode(null); // Cancel editing
+                      setEditContent(''); // Reset edit content
+                    }}
+                    className="p-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-white"
+                  >
+                    Cancel
+                  </button>
                 </div>
-              )}
-            </div>
+              </div>
+            ) : (
+              <>
+                <p className="text-sm font-bold">{comment.content}</p>
+                {/* User Info */}
+                <div className="flex justify-between items-center text-xs text-gray-400">
+                <p className=" text-white">Posted by: <span className="text-[#15ff00] font-bold">
+                {comment.username ? comment.username.charAt(0).toUpperCase() + comment.username.slice(1) : 'Anonymous'} </span></p>
+                  <p>2 hours ago</p>
+                </div>
+              </>
+            )}
+
+            {/* Action Buttons */}
+            {comment.username === Name_user && !editMode && (
+              <div className="flex gap-4 mt-2">
+                <button
+                  onClick={() => {
+                    setEditMode(comment._id); // Enter edit mode
+                    setEditContent(comment.content); // Pre-fill the edit content
+                  }}
+                  className="text-[#fffc37] font-bold hover:text-[#e4e146b8] text-xs"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDelete(comment._id)}
+                  className="text-[#ff0000] font-bold hover:text-red-500 text-xs"
+                >
+                  Delete
+                </button>
+              </div>
+            )}
           </div>
         ))}
       </div>
     </div>
   );
-};
+}
 
-export default CommentSection; 
+export default CommentSection;

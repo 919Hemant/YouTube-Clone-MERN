@@ -1,45 +1,23 @@
-import React, { useState, useContext } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import './Header.css'
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import PersonIcon from '@mui/icons-material/Person';
 import Sidebar from './SideBar';
+import { useState } from 'react';
 import LogoutIcon from '@mui/icons-material/Logout';
+import './Header.css';
 import VideoCard from './VideoCard';
 import { dataInfo } from '../utils/dummyData';
 import { Outlet } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import SwitchAccountIcon from '@mui/icons-material/SwitchAccount';
 import GoogleIcon from '@mui/icons-material/Google';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import YoutubeIcon from '../assets/Youtube_Icon.png';
-
-export const SearchContext = React.createContext({
-  searchQuery: '',
-  setSearchQuery: () => {},
-  isSearching: false,
-  setIsSearching: () => {}
-});
-
 function Header() {
    const navigate=useNavigate();
-   const [inputQuery, setInputQuery] = useState('')
-   const { setSearchQuery, setIsSearching } = useContext(SearchContext)
    const [dropdownVisible, setDropdownVisible] = useState(false); 
    const token = localStorage.getItem('token');
-   
-   const handleSearch = (e) => {
-    e.preventDefault()
-    setSearchQuery(inputQuery) 
-    setIsSearching(true) 
-    
-    // Navigate to home 
-    if (window.location.pathname !== '/') {
-      navigate('/')
-    }
-  }
-   
    function handleDropdownToggle() {
       setDropdownVisible(!dropdownVisible);
    }
@@ -53,16 +31,15 @@ function Header() {
       navigate('/')      
       
    }
-   const Name_user = localStorage.getItem('Name') || 'User';
-   const Email_user = localStorage.getItem('Email') || 'user@example.com';
+   const Name_user = localStorage.getItem('Name');
+   const Email_user = localStorage.getItem('Email');
    const [flag, setFlag] = useState(true);
    const [titleName, setTitleName] = useState('');
 
    function handleChange(e) {
       setTitleName(e.target.value);
-      setInputQuery(e.target.value);
+
    }
-   
    function handleMenuClick() {
       setFlag(!flag);
    }
@@ -75,9 +52,8 @@ function Header() {
                   <button onClick={handleMenuClick} className=' p-2 hover:rounded-full hover:bg-[#212121]'> <MenuIcon className='' /></button>
                </div>
                <div id='img-container' className='flex items-center ml-3'>
-               <img src={YoutubeIcon} id='img-id' alt='' width='30px' height='28px' />
-
-                  <h2 id='youtube-head' className='font-[500] text-[1.5rem]  pl-1'>YouTube</h2>
+                  <img src={YoutubeIcon} id='img-id' alt='' width='30px' height='28px' />
+                  <h2 id='youtube-head' className='font-[500] text-[1.5rem] pl-1'>YouTube</h2>
                </div>
             </div>
             <div className="sec-2 border border-[#646060] h-[3rem]  w-[45%] rounded-[2rem] ">
@@ -136,5 +112,4 @@ function Header() {
       </>
    )
 }
-
-export default Header; 
+export default Header;
