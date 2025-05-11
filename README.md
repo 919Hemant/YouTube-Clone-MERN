@@ -32,8 +32,8 @@ This repository contains a fully functional YouTube clone built with modern web 
 
 
 ## Demo Video
-- https://drive.google.com/file/d/1Y9NrXsIZgjUDbWAG-EoGppZc4HuHLgBS/view?usp=sharing
+- https://drive.google.com/file/d/1AQXc_Mz2x3vU4BFOqFYH33Mn-T1HrEqU/view?usp=sharing
 
 ## Deployed Website Link
-- https://you-tube-project-61ib.vercel.app/
+- https://you-tube-project
 
