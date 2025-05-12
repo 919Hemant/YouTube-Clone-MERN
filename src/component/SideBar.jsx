@@ -1,4 +1,4 @@
-
+// Imports for sidebar navigation
 import HomeIcon from '@mui/icons-material/Home';
 import VideoCameraFrontIcon from '@mui/icons-material/VideoCameraFront';
 import SubscriptionsIcon from '@mui/icons-material/Subscriptions';
@@ -19,12 +19,15 @@ import { Link } from 'react-router-dom';
 import './SideBar.css';
 import { useOutletContext } from 'react-router-dom';
 
+// Sidebar component with collapsible navigation menu
 function Sidebar() {
-   // console.log(props)
-   const { flag} = useOutletContext(); // Access props passed via context
+   // Get sidebar visibility state from Header component
+   const { flag} = useOutletContext(); // true = collapsed, false = expanded
    return (
       <>
+         {/* Conditional rendering based on sidebar state */}
          {flag ?
+            // Collapsed sidebar - icons only with small labels
             <div id='side-bar-sec1' className="side-bar w-[5%] flex flex-col  fixed  left-0 mt-[4rem] ">
 
                <Link to='/'><div className=' hover:bg-[#212121] hover:rounded-md flex flex-col justify-center items-center p-3 mb-4 text-white text-sm hover:cursor-pointer z-10'>
@@ -53,7 +56,9 @@ function Sidebar() {
 
 
             </div> :
+            // Expanded sidebar - full width with text labels
             <div className='sideBar-description w-[15%] overflow-y-scroll scroll-bar h-[85vh] text-white fixed z-50 bg-[#0f0f0f] left-0 mt-[4rem]'>
+               {/* Main navigation section */}
                <div className="sidebar-1 border-b border-[#212121] mb-2">
                   <Link to='/'><div className='p-3 cursor-pointer hover:bg-[#212121]'>
                      <HomeIcon />
@@ -68,6 +73,7 @@ function Sidebar() {
                      <span className='pl-3'>Subscription</span>
                   </div>
                </div>
+               {/* User section */}
                <div className="sidebar-2 border-b border-[#212121] mb-2">
                   <div className='p-3 cursor-pointer hover:bg-[#212121]'>
                      <AccessibilityNewIcon />
@@ -78,6 +84,7 @@ function Sidebar() {
                      <span className='pl-3'>History</span>
                   </div>
                </div>
+               {/* Explore section with content categories */}
                <div className="sidebar-3 p-3 border-b border-[#212121] mb-2">
                   <h1 className='pl-3'>Explore</h1>
                   <div className='p-3 cursor-pointer hover:bg-[#212121]'>

@@ -1,19 +1,22 @@
+// Imports for registration functionality
 import { Link,useNavigate } from "react-router-dom";
 import HomeIcon from '@mui/icons-material/Home';
 import './SignIn.css';
 import { useState } from "react";
 import YoutubeIcon from '../assets/Youtube_Icon.png';
 
+// User registration component
 function SignUp(){
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // For redirecting after registration
 
+  // Form state for user registration details
   const [user_details,setUserDetails]=useState({
     name:'',
     email:'',
     password:''
   });
-  const [msg,set_msg]=useState('');
-  const [err_msg,set_err_msg]=useState('')
+  const [msg,set_msg]=useState(''); // Success message
+  const [err_msg,set_err_msg]=useState('') // Error message
 
   function handleNameChange(e){
     setUserDetails({...user_details,name:e.target.value});
@@ -29,16 +32,17 @@ function SignUp(){
     setUserDetails({...user_details,password:e.target.value});
     set_err_msg('')
   }
+  // Handle form submission
   function handleSubmit(e) {
     e.preventDefault();
 
-    // Validate inputs
+    // Validate that all fields are filled
     if (!user_details.name || !user_details.email || !user_details.password) {
         set_err_msg("All fields are required!");
         return;
     }
 
-    // Perform the registration request
+    // Send registration data to backend API
     fetch('https://youtube-project-py16.onrender.com/register', {
         method: "POST",
         headers: {
@@ -62,11 +66,11 @@ function SignUp(){
         return response.json(); // If successful, parse the response as JSON
     })
     .then(data => {
-        // If registration is successful
+        // Show success message on successful registration
         set_msg('Registration is Successful');
         set_err_msg(''); // Clear any error message
 
-        // Redirect to SignIn page after successful registration
+        // Redirect to login page after brief delay
         setTimeout(() => {
             navigate('/SignIn');
         }, 1000);
@@ -85,10 +89,12 @@ function SignUp(){
     });
 }
 
+    // Render registration form
     return (
         <>
             <div id='outer-div' className="flex h-[80vh] w-[85%] mx-auto my-5 mt-[4rem]  justify-center items-center text-white flex-col">
         <div id='inner-div' className="  bg-[#212121] w-[60%]  rounded-[0.8rem] flex flex-col items-center">
+          {/* Header with logo and title */}
           <div className="flex items-center">
             <img src={YoutubeIcon} width='60px' height='100px' alt="" />
             <h1 className="font-bold">YouTube Sign Up</h1> 

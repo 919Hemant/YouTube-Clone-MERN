@@ -1,16 +1,21 @@
+// Import React hooks and routing components
 import { useState, useEffect } from "react";
-import {Link,useParams} from 'react-router-dom';
+import {Link,useParams} from 'react-router-dom'; // For navigation and accessing URL parameters
 
+/**
+ * Comment section component for video pages
+ * Allows users to view, add, edit, and delete comments
+ */
 function CommentSection() {
-  const token = localStorage.getItem('token');
-  const [commentDetails, set_comment] = useState([]);
+  const token = localStorage.getItem('token'); // Get auth token to check if user is logged in
+  const [commentDetails, set_comment] = useState([]); // State for storing all comments
   const [content, set_content] = useState(''); // For new comments
   const [editMode, setEditMode] = useState(null); // To track which comment is being edited
   const [editContent, setEditContent] = useState(''); // For editing existing comment
-  const Name_user = localStorage.getItem('Name');
-   const Video_id_Num=useParams().id;
+  const Name_user = localStorage.getItem('Name'); // Get username from local storage
+   const Video_id_Num=useParams().id; // Get video ID from URL parameters
    console.log(Video_id_Num)
-  // Fetch comments from backend
+  // Fetch all comments from backend when component mounts or comments change
   useEffect(() => {
     fetch('https://youtube-project-py16.onrender.com/getComments')
       .then((response) => response.json())
@@ -74,7 +79,7 @@ function CommentSection() {
 
   return (
     <div className="max-w-4xl mx-auto p-4 mt-3 rounded-lg bg-[#212121] text-white">
-      {/* Comment Input Section */}
+      {/* Comment Input Section - Only shown to logged in users */}
       {token ? (
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <input
@@ -92,12 +97,13 @@ function CommentSection() {
           </button>
         </div>
       ) : (
+        // Login prompt for users who aren't logged in
         <div className="mb-6 text-center text-gray-400">
                <h1 className="  m-4 text-white font-bold ">Please <Link to='/SignIn'><span className="text-[#33f733] underline">Login</span> </Link>  in order to add comments</h1>
         </div>
       )}
 
-      {/* Comments Section */}
+      {/* List of all comments */}
       <div className="space-y-4">
         {commentDetails.map((comment,index) => (
           
@@ -106,7 +112,7 @@ function CommentSection() {
             key={comment._id||index}
             className="bg-[#212121] border border-gray-600 p-4 rounded-lg flex flex-col gap-2"
           >
-            {/* Comment Text */}
+            {/* Edit mode - Shows input field when user is editing a comment */}
             {editMode === comment._id ? (
               <div className="flex flex-col gap-2">
                 <input
@@ -135,8 +141,9 @@ function CommentSection() {
               </div>
             ) : (
               <>
+                {/* Display mode - Shows comment content and metadata */}
                 <p className="text-sm font-bold">{comment.content}</p>
-                {/* User Info */}
+                {/* Comment author and timestamp */}
                 <div className="flex justify-between items-center text-xs text-gray-400">
                 <p className=" text-white">Posted by: <span className="text-[#15ff00] font-bold">
                 {comment.username ? comment.username.charAt(0).toUpperCase() + comment.username.slice(1) : 'Anonymous'} </span></p>
@@ -145,7 +152,7 @@ function CommentSection() {
               </>
             )}
 
-            {/* Action Buttons */}
+            {/* Edit/Delete buttons - Only shown to comment author */}
             {comment.username === Name_user && !editMode && (
               <div className="flex gap-4 mt-2">
                 <button

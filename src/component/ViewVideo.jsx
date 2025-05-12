@@ -1,3 +1,4 @@
+// Imports for video viewing page
 import Sidebar from "./SideBar";
 import { useOutletContext } from "react-router-dom";
 import { useParams } from "react-router-dom";
@@ -13,14 +14,16 @@ import { useState,useEffect } from "react";
 import CommentSection from "./CommentSection";
 import './ViewVideo.css'
 import ShimmerView from "./ShimmerViewVideo";
+// Component for displaying a single video with details and comments
 function ViewVideo(){
-   const [video_details,setVideoDetails]=useState([]);
-   const [filteredData,setFilteredData]=useState('');
-    const { flag, titleName } = useOutletContext();
+   const [video_details,setVideoDetails]=useState([]); // All videos
+   const [filteredData,setFilteredData]=useState(''); // Current video being viewed
+    const { flag, titleName } = useOutletContext(); // Sidebar visibility from Header
    
-    let video_id=useParams().id;
+    let video_id=useParams().id; // Get video ID from URL
     console.log(video_id);
 
+    // Fetch all videos on component mount
     useEffect(()=>{
       fetchdata()
     },[])
@@ -33,6 +36,7 @@ function ViewVideo(){
       console.log(video_details)
        
     }
+    // Filter to find the current video when data or ID changes
     useEffect(() => {
       if (video_details.length > 0) {
          const filtered = video_details.filter((item) => item._id === video_id);

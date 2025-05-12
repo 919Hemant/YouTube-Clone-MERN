@@ -1,13 +1,17 @@
+// Imports for the suggested videos sidebar component
 import { dataInfo } from "../utils/dummyData";
 import './SuggestedVideo.css';
 import { Link } from "react-router-dom";
 import CircleIcon from '@mui/icons-material/Circle';
 import { useState,useEffect } from "react";
+// Component that displays suggested videos in the sidebar
 function SuggestedVideo() {
     const [video_details,setVideoDetails]=useState([]);
+    // Fetch videos when component mounts
     useEffect(()=>{
         fetchdata()
     },[])
+    // Get videos from API
     async function fetchdata(){
         let response=await fetch('https://youtube-project-py16.onrender.com/');
         let data=await response.json();

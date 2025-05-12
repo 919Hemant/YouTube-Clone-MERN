@@ -1,16 +1,18 @@
+// Imports for sign-in functionality
 import { Link,useNavigate } from 'react-router-dom';
 import HomeIcon from '@mui/icons-material/Home';
 import './SignIn.css';
 import { useState } from 'react';
 import YoutubeIcon from '../assets/Youtube_Icon.png';
+// User login component
 function SignIn() {
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // For redirecting after login
   const [user_details,setUserDetails]=useState({
     email:'',
     password:''
   });
-  const [msg,set_msg]=useState('');
-  const [err_msg,set_err_msg]=useState('');
+  const [msg,set_msg]=useState(''); // Success message
+  const [err_msg,set_err_msg]=useState(''); // Error message
   function handleEmailChange(e){
     setUserDetails({...user_details,email:e.target.value})
     set_err_msg('')
@@ -19,16 +21,18 @@ function SignIn() {
     setUserDetails({...user_details,password:e.target.value})
     set_err_msg('')
   }
+  // Handle form submission for login
   function handleSubmit(e) {
     e.preventDefault();
 
+    // Validate form fields
     if (!user_details.email || !user_details.password) {
         set_err_msg("All fields are required!");
        
         return;
     }
 
-    // Perform the login request
+    // Send login request to backend API
     fetch('https://youtube-project-py16.onrender.com/login', {
         method: "POST",
         headers: {
@@ -50,7 +54,7 @@ function SignIn() {
         return response.json(); // If successful, parse the response as JSON
     })
     .then(data => {
-        // If login is successful
+        // Store user data in localStorage on successful login
         console.log(data);
         localStorage.setItem('token',data.tokenNumber);
         localStorage.setItem('Name',data.user.Name);
@@ -59,7 +63,7 @@ function SignIn() {
         set_msg('Logged In Successfully');
         set_err_msg(''); // Clear any error message
         setTimeout(() => {
-            navigate('/');  // Use navigate to redirect to the homepage
+            navigate('/');  // Redirect to homepage after login
         }, 900);
     })
     .catch(error => {
