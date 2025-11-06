@@ -24,7 +24,7 @@ function VideoCard(){
   async function fetchdata(){
     setIsLoading(true);
     try {
-      let response = await fetch('https://youtube-project-py16.onrender.com/');
+      let response = await fetch('http://localhost:3000/');
       let data = await response.json();
       setVideoDetails(data); // Set current videos to display
       set_dummy_VideoDetails(data); // Store original data for filtering
