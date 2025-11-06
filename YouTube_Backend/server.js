@@ -5,7 +5,7 @@ import {routes} from './Routes/YoutubeData.routes.js' // Import YouTube data rou
 const app=express(); // Initialize Express application
 let databaseName='Youtube_Clone'; // Database name for the application
 // Connect to MongoDB Atlas database
-mongoose.connect(`mongodb+srv://Internshala:Internshala@cluster0.3dyau.mongodb.net/`);
+mongoose.connect(`mongodb+srv://hemant_user:Hemant%40123@hemantcluster111.cqk63uv.mongodb.net/`);
 // Import additional route modules
 import { userRoutes } from './Routes/User.routes.js'; // User authentication routes
 import cors from 'cors'; // Cross-Origin Resource Sharing middleware
